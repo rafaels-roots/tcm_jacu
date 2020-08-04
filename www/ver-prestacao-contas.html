@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html>
+
+<head> 
+    <meta charset="utf-8" />
+   
+    <title>Tribunal de Contas</title>
+</head>
+
+<body>
+    <div data-role="page" id="ver-prestacao-contas">
+        <header data-role="header" data-position="fixed">
+            <h3>Prestação de Contas</h3>
+           <a href="#" data-transition="fade" data-rel="back" id="menu" data-position-to="#menu" data-role="button" data-icon="back" data-iconshadow="false" data-theme="a" data-iconpos="notext"  class="ui-btn-left ui-nodisc-icon az-nodisc">home</a>
+        </header>
+
+        <div data-role="main" class="ui-content">
+            
+            <div>
+                <p id="filter"></p>
+            </div>
+            
+            <ul data-icon="false" data-role="listview" id="list_PrestacaoContas" data-count-theme="b">
+            </ul>
+
+             <p id="list-info">
+                <span id="atualizacao"></span> <br /> 
+                <span id="fonte"></span> 
+            </p>
+        </div>
+      
+
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Transparência Maranguape</h1>
+        </div>
+
+        <script type="text/javascript">
+            $("#ver-prestacao-contas").on("pageshow", function()
+                {
+                   
+                    $.mobile.loading("show",{
+                        text : 'Carregando...',
+                        textVisible : true,
+                        theme : 'b'
+
+                    });
+
+                    $.getJSON('https://elohimsystems.com.br/tcm/php/ver-prestacao-contas.php?callback=?', {action: "f_select_prestacao_contas", param1 : sessionStorage.getItem("codigo-municipio"), param2 : sessionStorage.getItem("ano-municipio")  }, function(data) 
+                        { 
+                           const total = data.total == null ? "Não foi encontrado Registro para o exercicio de "+sessionStorage.getItem("ano-municipio") : data.total;     
+                           $("#filter").html(sessionStorage.getItem("text-municipio")+' &#187 '+
+                                              'Câmara de Vereadores &#187 ' +
+                                              sessionStorage.getItem('opcao-menu') + ' &#187 ' +
+                                              sessionStorage.getItem('ano-municipio'));
+                            
+                           const json = data.dados; 
+                           let list = "";
+                           let unid = "";
+                           for(let i = 0, len = json.length; i < len; i++) 
+                               {
+                                    
+                                    if(unid != json[i]["Unid"]) 
+                                        {
+                                            list += '<li data-role="list-divider" data-theme="b">'+json[i]["Unid"]+'</li>';
+                                        } 
+                                    
+                                    list += "<li>"+
+                                                "<a href='#'>"+
+                                                    json[i]["Mes"]+
+                                                    "<p><strong>Data Limite </strong>: "+json[i]["DtLimite"]+
+                                                    "<br /><strong>Data Entregue </strong>: "+json[i]["DtEntregue"]+
+                                                    "</p>"+
+                                                    "<span class='ui-li-count ui-body-a'>"+json[i]["Sit"]+"</span>"+
+                                                "</a>"+
+                                                
+                                            "</li>";
+                                    
+                                    unid = json[i]["Unid"];    
+                                    
+                               }
+
+                            const ul = $("#list_PrestacaoContas");
+                            ul.append(list);
+                            ul.listview("refresh");
+                            ul.trigger("updatelayout");
+
+                            document.getElementById("list-info").style.display = "block";
+                            document.getElementById("filter").style.display = "block";
+                            document.getElementById("atualizacao").innerHTML = sessionStorage.getItem("atualizacao");
+                            document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+sessionStorage.getItem("fonte"); 
+
+                             $.mobile.loading("hide"); 
+    
+                        });      
+                });
+        </script>
+
+   </div> 
+</body>
+ 
+</html>

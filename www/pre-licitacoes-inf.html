@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html> 
+
+<head>
+    <meta charset="utf-8" />
+    <title>Tribunal de Contas</title>
+</head>
+
+<body>
+    <div data-role="page" id="pre-licitacoes-inf">
+        <header data-role="header" data-position="fixed">
+            <h3>Licitações Informadas</h3>
+           <a href="#" data-transition="fade" data-rel="back" id="menu" data-position-to="#menu" data-role="button" data-icon="back" data-iconshadow="false" data-theme="a" data-iconpos="notext"  class="ui-btn-left ui-nodisc-icon az-nodisc">home</a>
+        </header>
+
+        <div data-role="main" class="ui-content">
+            
+            <div>
+                <p id="filter"></p>
+            </div>
+            
+            <ul data-icon="false" data-role="listview" id="list_LicitacoesInf" data-filter="true" data-filter-placeholder="Buscar..." data-count-theme="b">             
+            </ul>
+
+            <div id="dados_null">&laquo;Vazio&raquo;</div>
+
+            <p id="list-info">
+                <span id="atualizacao"></span> <br /> 
+                <span id="fonte"></span> 
+            </p>
+
+        </div>
+      
+
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Transparência Maranguape</h1>
+        </div>
+
+        <script type="text/javascript">
+            $("#pre-licitacoes-inf").on("pageshow", function()
+                {
+                    $.mobile.loading("show",{
+                        text : 'Carregando...',
+                        textVisible : true,
+                        theme : 'b'
+
+                    });
+
+                    $.getJSON('https://elohimsystems.com.br/tcm/php/pre-licitacoes-inf.php?callback=?', {action: "f_select_licitacoes_inf", param1 : sessionStorage.getItem("codigo-municipio"), param2 : sessionStorage.getItem("ano-municipio")  }, function(data) 
+                        {                             
+                            
+                            if(data.dados.length == 0) 
+                                {
+                                    $("#filter").html(data.municipio+' &#187 '+
+                                              'Prefeitura &#187 '+
+                                              sessionStorage.getItem("opcao-menu")+' &#187 '+
+                                              sessionStorage.getItem("ano-municipio")+ ' &#187 ' +
+                                              data.qtdelicitacoes);
+                                    $(".ui-input-search").css("display", "none");
+                                    $("#dados_null").css("display", "block");
+                            
+                                }
+                            else 
+                                {
+                                     $("#filter").html(data.municipio+' &#187 '+
+                                                      'Prefeitura &#187 '+
+                                                      sessionStorage.getItem("opcao-menu")+' &#187 '+
+                                                      sessionStorage.getItem("ano-municipio")+ ' &#187 ' +
+                                                      data.qtdelicitacoes);
+                                }    
+                            
+
+                            let dados =  data.dados;
+                            let dte = "";
+                            let list_LicitacoesInf ="";
+                            for(let i = 0, len = dados.length; i < len; i++) 
+                              {
+                                if(dados[i]['dtedital']) { dte = "-"; } else { dte = dados[i]['dtedital']; }
+                                list_LicitacoesInf += '<li><a href="pre-licitacoes-inf-detalhes.html" id="'+dados[i]['link']+'">'+
+                                                                '<h1>'+dados[i]['codigo']+'</h1>' +
+                                                                '<p><strong>Dt. Realização : </strong>'+dados[i]['dtrealizacao']+'<br />' +
+                                                                '<strong>Dt.Edital :</strong> ' +dte+' <br />'+
+                                                                '<strong>Modalidade :</strong> '+dados[i]['modalidade']+' <br /> '+
+                                                                '<strong>Tipo :</strong> '+dados[i]['tipo']+'</p>' +
+                                                                '<span class="ui-li-count">'+dados[i]['valor']+'</span>'+
+                                                            '</a>' +
+                                                            
+                                                      '</li>';
+                              }
+
+                            let ul = $("#list_LicitacoesInf"); 
+                            ul.html(list_LicitacoesInf);
+                            ul.listview("refresh");
+                            ul.trigger("updatelayout");
+
+                            document.getElementById("list-info").style.display = "block";
+                            document.getElementById("filter").style.display = "block";
+                            document.getElementById("atualizacao").innerHTML = sessionStorage.getItem("atualizacao");
+                            document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+sessionStorage.getItem("fonte"); 
+
+                            $.mobile.loading("hide"); 
+                           
+    
+                        });      
+                    $("#list_LicitacoesInf").on("click", ".ui-btn", function()
+                        {
+                            sessionStorage.setItem("lic-text", $(this).text() );
+                            sessionStorage.setItem("lic-link", this.id );
+                        });
+
+                });
+        </script>
+
+   </div> 
+</body>
+ 
+</html>

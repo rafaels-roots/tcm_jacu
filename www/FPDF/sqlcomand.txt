@@ -1,0 +1,45 @@
+select 
+									lot.lot_codigo,
+									cli.cli_nome,
+									DATE_FORMAT(lot.lot_data, "%d/%m/%Y") as lot_data,
+									DATE_FORMAT(lot.lot_datacadastro, "%d/%m/%Y %h:%i") as lot_datacadastro,
+									lot.lot_observacao,
+									lot.lot_status,
+									loi.loi_codigo,
+									dev.dev_nome,
+									ser.ser_descricao,
+									loi.loi_referente,
+									DATE_FORMAT(loi.loi_vencimento, "%d/%m/%Y") as loi_vencimento,
+									loi_valorprincipal,
+									loi.loi_percentualmulta,
+									(loi.loi_valorprincipal*loi.loi_percentualmulta)/100 as loi_multa,
+									loi.loi_juros,
+									loi.loi_percentualjuros,
+									(loi.loi_valorprincipal*loi.loi_percentualjuros)/100*(if(DATEDIFF(curdate(),loi.loi_vencimento)<=0,0,DATEDIFF(curdate(),loi.loi_vencimento))) as loi_juros_calc,
+
+									loi.loi_valorcobranca,
+									loi.loi_percentualcobranca,
+									((loi.loi_valorprincipal)+
+									((loi.loi_valorprincipal*loi.loi_percentualmulta)/100)+
+									((loi.loi_valorprincipal*loi.loi_percentualjuros)/100 * (if(DATEDIFF(curdate(),loi.loi_vencimento)<=0,0,DATEDIFF(curdate(),loi.loi_vencimento))) ))*(loi.loi_percentualcobranca/100) as loi_valorcobranca_calc,
+									
+									loi.loi_total,
+									(loi_valorprincipal) +
+									((loi.loi_valorprincipal*loi.loi_percentualmulta)/100) +
+									((loi.loi_valorprincipal*loi.loi_percentualjuros)/100 * (if(DATEDIFF(curdate(),loi.loi_vencimento)<=0,0,DATEDIFF(curdate(),loi.loi_vencimento))) ) +
+									(((loi.loi_valorprincipal)+
+									((loi.loi_valorprincipal*loi.loi_percentualmulta)/100)+
+									((loi.loi_valorprincipal*loi.loi_percentualjuros)/100 * (if(DATEDIFF(curdate(),loi.loi_vencimento)<=0,0,DATEDIFF(curdate(),loi.loi_vencimento))) ))*(loi.loi_percentualcobranca/100)) as loi_total_calc,
+
+									loi.loi_observacao,
+									loi.loi_status,
+									loi.aco_codigo
+
+									from lot lot,loi loi,cli cli,dev dev,ser ser
+									where lot.lot_codigo =  and
+									lot.cli_codigo = cli.cli_codigo and
+									lot.lot_codigo = loi.lot_codigo and
+									loi.dev_codigo = dev.dev_codigo and
+									lot.cli_codigo = ser.cli_codigo and
+									loi.ser_codigo = ser.ser_codigo
+									order by loi.loi_codigo

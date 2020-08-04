@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+ 
+<html>
+
+<head>
+    <meta charset="utf-8" />
+   
+    <title>Tribunal de Contas</title>
+</head>
+
+<body>
+    <div data-role="page" id="ver-favorecidos">
+        <header data-role="header" data-position="fixed">
+            <h3>Favorecido</h3>
+          <a href="#" data-transition="fade" data-rel="back" id="menu" data-position-to="#menu" data-role="button" data-icon="back" data-iconshadow="false" data-theme="a" data-iconpos="notext"  class="ui-btn-left ui-nodisc-icon az-nodisc">home</a>
+        </header>
+
+        <div data-role="main" class="ui-content">
+            
+            <div>
+                <p id="filter"></p>
+            </div>
+            
+            <ul data-icon="false" data-role="listview" id="list_Favorecidos" data-filter="true" data-filter-placeholder="Buscar..." data-count-theme="b"></ul>
+
+            <p id="list-info">
+                <span id="atualizacao"></span> <br /> 
+                <span id="fonte"></span> 
+            </p>
+
+          
+
+        </div>
+      
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Transparência Maranguape</h1>
+        </div>
+
+
+
+        <script type="text/javascript">
+            $("#ver-favorecidos").on("pageshow", function()
+                {
+                    
+                    $.mobile.loading("show",{
+                        text : 'Carregando...',
+                        textVisible : true,
+                        theme : 'b'
+
+                    });
+
+                    $.getJSON('https://elohimsystems.com.br/tcm/php/ver-favorecidos.php?callback=?', {action: "f_select_favorecidos", param1 : sessionStorage.getItem("codigo-municipio"), param2 : sessionStorage.getItem("ano-municipio"), link : sessionStorage.getItem("tdespesa-link")  }, function(data) 
+                        { 
+                            
+                           let filter = "";
+                           if(data.dados.length == 0) 
+                               {
+                                   filter = sessionStorage.getItem("text-municipio")+' &#187 '+
+                                              'Câmara de Vereadores &#187 ' +
+                                              sessionStorage.getItem('opcao-menu') + ' &#187 Despesa : ' +
+                                              sessionStorage.getItem('despesa-text') + ' &#187 Favorecido : ' + 
+                                              sessionStorage.getItem('tdespesa-text') + ' &#187 ' +  
+                                              sessionStorage.getItem('ano-municipio');
+                                    $(".ui-input-search").css("display", "none");
+                                    $("#dados_null").css("display", "block");
+                               }   
+                           else 
+                               {
+                                    filter = sessionStorage.getItem("text-municipio")+' &#187 '+
+                                              'Câmara de Vereadores &#187 ' +
+                                              sessionStorage.getItem('opcao-menu') + ' &#187 Despesa : ' +
+                                              sessionStorage.getItem('despesa-text') + ' &#187 Favorecido : ' + 
+                                              sessionStorage.getItem('tdespesa-text') + ' &#187 ' +  
+                                              sessionStorage.getItem('ano-municipio') + ' &#187 ' + data.total;
+                               } 
+                            $("#filter").html(filter); 
+
+                            const dados = data.dados;
+                            let li = "";
+                            for(let i = 0, len = dados.length; i < len; i++) 
+                                {
+                                      li += "<li>" +
+                                                "<a href='#'>"+
+                                                    "<p class='ui-li-aside'><strong>"+dados[i]['data']+"</strong></p>" + 
+                                                    dados[i]['text']+
+                                                    "<span class='ui-li-count'>"+dados[i]['valor']+"</span>" +
+                                                "</a>" +
+                                            "</li>";
+
+
+                                }
+                           
+                            const ul = $("#list_Favorecidos");
+                            ul.html(li);
+                            ul.listview("refresh");
+                            ul.trigger("updatelayout");
+
+
+                            li = "";
+                            $.each( $("#list_Favorecidos li"), function(i)
+                                {
+                                    let xz = $(this).find('a:nth-child(1)').html();
+                                    li += "<li>" +
+                                            "<a href='#' id='http://municipios.tce.ce.gov.br"+$(this).find("a[href^='/transparencia']").attr("href")+"' class='ui-btn'>" + xz.substr(0,xz.length - 2) + 
+                                                "<span class='ui-li-count'>"+$(this).find('span').text()+"</span>" +
+                                            "</a>" +
+                                            
+                                          "</li>";  
+                                    
+                                });
+                            $("#list_Favorecidos li").remove();
+                            $("#list_Favorecidos").html(li).listview('refresh');
+
+                            document.getElementById("list-info").style.display = "block";
+                            document.getElementById("filter").style.display = "block";
+                            document.getElementById("atualizacao").innerHTML = sessionStorage.getItem("atualizacao");
+                            document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+sessionStorage.getItem("fonte"); 
+
+                            $.mobile.loading("hide"); 
+
+                            
+
+                        }); 
+
+
+                    
+                    $("#list_Favorecidos").on("click", "li", function()
+                        {    
+                           
+                            $.mobile.loading("show",{
+                                text : 'Gerando Pdf...',
+                                textVisible : true,
+                                theme : 'b'
+
+                            });
+
+                            /*$.getJSON('http://www.elohimsystems.com.br/transmpe/FPDF/favorecidopdf.php?callback=?',{ link : $(this).find("a").attr("id") }, function(data) 
+                                {
+                                    
+                                    DocumentViewer.previewFileFromUrlOrPath(function () 
+                                        {
+                                            console.log('success');
+                                        }, function (error) 
+                                        {
+                                            if (error == 53) 
+                                                {
+                                                    console.log('No app that handles this file type.');
+                                                }
+                                            else if (error == 2)
+                                                {
+                                                    console.log('Invalid link');
+                                                }
+                                        },
+                                    'http://www.elohimsystems.com.br/transmpe/FPDF/doc.pdf', 'pdf-sample');
+                                    $.mobile.loading("hide");
+
+                                }); */
+
+                            
+                        });                                
+                });
+        </script>
+
+   </div> 
+</body>
+ 
+</html>

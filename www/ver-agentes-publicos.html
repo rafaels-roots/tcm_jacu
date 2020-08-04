@@ -1,0 +1,193 @@
+<!DOCTYPE html> 
+
+<html>
+
+<head>
+     <meta charset="utf-8" />
+    <title>Tribunal de Contas</title>
+</head>
+
+<body>
+    <div data-role="page" id="ver-agentes-publicos">
+        <header data-role="header" data-position="fixed">
+            <h3>Agentes Públicos</h3>
+          <a href="#" data-transition="fade" data-rel="back" id="menu" data-position-to="#menu" data-role="button" data-icon="back" data-iconshadow="false" data-theme="a" data-iconpos="notext"  class="ui-btn-left ui-nodisc-icon az-nodisc">home</a>
+        </header>
+
+        <div data-role="main" class="ui-content">
+
+             <div>
+                <p id="filter"></p>
+            </div> 
+
+             <form id="form_letra">
+
+
+                <fieldset data-role="controlgroup">
+                    <label for="indice">Índice : </label>
+                    <select name="ind" id="indice">
+                      <option value="A">A</option>
+                      <option value="B">B</option>
+                      <option value="C">C</option>
+                      <option value="D">D</option>
+                      <option value="E">E</option>
+                      <option value="F">F</option>
+                      <option value="G">G</option>
+                      <option value="H">H</option>
+                      <option value="I">I</option>
+                      <option value="J">J</option>
+                      <option value="K">K</option>
+                      <option value="L">L</option>
+                      <option value="M">M</option>
+                      <option value="N">N</option>
+                      <option value="O">O</option>
+                      <option value="P">P</option>
+                      <option value="Q">Q</option>
+                      <option value="R">R</option>
+                      <option value="S">S</option>
+                      <option value="T">T</option>
+                      <option value="U">U</option>
+                      <option value="V">V</option>
+                      <option value="W">W</option>
+                      <option value="X">X</option>
+                      <option value="Y">Y</option>
+                      <option value="Z">Z</option>
+                    </select>
+                </fieldset>
+            </form>
+
+            <ul data-role="listview" id="list_AgentesPublicos" data-filter="true" data-filter-placeholder="Buscar..." data-icon="false" data-count-theme="b">
+            </ul>
+
+            <p id="list-info">
+                <span id="atualizacao"></span> <br /> 
+                <span id="fonte"></span> 
+            </p>
+
+        </div>
+      
+
+    
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Transparência Maranguape</h1>
+        </div>
+
+        
+        <script type="text/javascript">
+            $("#ver-agentes-publicos").on("pageshow", function()
+                {                    
+
+
+                  $.mobile.loading("show",{
+                        text : 'Carregando...',
+                        textVisible : true,
+                        theme : 'b'
+
+                    });
+ 
+                    $.getJSON('https://elohimsystems.com.br/tcm/php/ver-agentes-publicos.php?callback=?', {action: "f_select_agentes_publicos", param1 : sessionStorage.getItem("codigo-municipio"), param2 : sessionStorage.getItem("ano-municipio"), param3 : $('#indice').val()  }, function(data) 
+                        { 
+                           
+                            $("#filter").html(sessionStorage.getItem("text-municipio")+' &#187 '+
+                                              'Câmara de Vereadores &#187 ' + 
+                                              sessionStorage.getItem("opcao-menu")+' &#187 '+
+                                              data.situacao+' &#187 '+
+                                              sessionStorage.getItem("ano-municipio") );
+                            
+
+
+                            const dados = data.dados;
+                            let list ="";
+                            for(let i = 0, len = dados.length; i < len; i++) 
+                              {
+                                list += '<li><a href="#">'+dados[i]["nome"] +
+                                            '<p><strong>'+dados[i]["lotacao"] +'</strong> <br /> Vinculo : ' 
+                                               +dados[i]["vinculo"] +' <br />  Ato de Nomeação : ' 
+                                               +dados[i]["atnomeacao"] +' <br /> Dt. Posse : '
+                                               +dados[i]["dtposse"] +' - Dt. Desligamento : ' 
+                                               +dados[i]["dtdesligamento"] +'</p>' +
+                                            '</a>' +
+                                        '</li>';
+                              }
+                              
+                            let ul = $("#list_AgentesPublicos");
+                            ul.append(list);
+                            ul.listview("refresh");
+                            ul.trigger("updatelayout");
+
+                            document.getElementById("list-info").style.display = "block";
+                            document.getElementById("filter").style.display = "block";
+                            document.getElementById("atualizacao").innerHTML = sessionStorage.getItem("atualizacao");
+                            document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+sessionStorage.getItem("fonte"); 
+
+                            $.mobile.loading("hide"); 
+
+    
+                        });      
+
+                    $("#indice").on("change", function()
+                      {
+
+                          $("#list_AgentesPublicos li").remove();
+                          
+                          document.getElementById("filter").style.display = "none";
+                          document.getElementById("list-info").style.display = "none";
+                          document.getElementById("indice").style.display = "none";
+                            
+                          $.mobile.loading("show",{
+                              text : 'Carregando...',
+                              textVisible : true,
+                              theme : 'b'
+
+                           });
+                          $.getJSON('https://elohimsystems.com.br/tcm/php/ver-agentes-publicos.php?callback=?', {action: "f_select_agentes_publicos", param1 : sessionStorage.getItem("codigo-municipio"), param2 : sessionStorage.getItem("ano-municipio"), param3 : $('#indice').val()  }, function(data) 
+                                { 
+
+                                     $("#filter").html(sessionStorage.getItem("text-municipio")+' &#187 '+
+                                              'Câmara de Vereadores &#187 ' +  
+                                              sessionStorage.getItem("opcao-menu")+' &#187 '+
+                                              data.situacao+' &#187 '+
+                                              sessionStorage.getItem("ano-municipio"));
+                          
+                                    const dados = data.dados;
+                                    let list ="";
+                                    for(let i = 0, len = dados.length; i < len; i++) 
+                                      {
+                                        list += '<li><a href="#">'+dados[i]["nome"] +
+                                                    '<p><strong>'+dados[i]["lotacao"] +'</strong> <br /> Vinculo : ' 
+                                                       +dados[i]["vinculo"] +' <br />  Ato de Nomeação : ' 
+                                                       +dados[i]["atnomeacao"] +' <br /> Dt. Posse : '
+                                                       +dados[i]["dtposse"] +' - Dt. Desligamento : ' 
+                                                       +dados[i]["dtdesligamento"] +'</p>' +
+                                                    '</a>' +
+                                                '</li>';
+                                      }
+
+                                    let ul = $("#list_AgentesPublicos");
+                                    ul.append(list);
+                                    ul.listview("refresh");
+                                    ul.trigger("updatelayout");
+
+                                    document.getElementById("list-info").style.display = "block";
+                                    document.getElementById("filter").style.display = "block";
+                                    document.getElementById("atualizacao").innerHTML = sessionStorage.getItem("atualizacao");
+                                    document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+sessionStorage.getItem("fonte"); 
+
+                                    $.mobile.loading("hide"); 
+            
+                                }); 
+                      });
+
+                    
+
+
+                });
+        </script>
+
+        
+
+   </div> 
+</body>
+
+</html>

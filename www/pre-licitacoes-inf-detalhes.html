@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+   <meta charset="utf-8" />
+    <title>Tribunal de Contas</title>
+</head>
+
+<body>
+    <div data-role="page" id="pre-licitacoes-inf-detalhes">
+        <header data-role="header" data-position="fixed">
+            <h3>Licitações Informadas (Detalhe)</h3>
+            <a href="#" data-transition="fade" data-rel="back" id="menu" data-position-to="#menu" data-role="button" data-icon="back" data-iconshadow="false" data-theme="a" data-iconpos="notext"  class="ui-btn-left ui-nodisc-icon az-nodisc">home</a>
+        </header>
+
+        <div data-role="main" class="ui-content">
+            
+            <div>
+                <p id="filter"></p>
+            </div>
+
+            <p id="info-licitacao">
+                 <span id='vencedor'>Vencedor : </span><span id="value_vencedor"></span><br />
+                <span id='dhrealizacao'>Data/Hora Realização :  </span><span id="value_dhrealizacao"></span> <br />
+                <span id='dautuacao'>Data de Autuação do Processo Adm. : </span><span id="value_dautuacao"></span> <br />
+                <span id='modalidade'>Modalidade : </span><span id="value_modalidade"></span> <br />
+                <span id='tipo'>Tipo : </span><span id="value_tipo"></span> <br />
+                <span id='vlrestimado'>Valor Estimado : </span><span id="value_vlrestimado"></span> <br />
+                <span id='vlrlimite'>Valor Limite : </span><span id="value_vlrlimite"></span> <br />
+                <span id='empregado'>Valor Empregado : </span><span id="value_empregado"></span> <br />
+                <span id='objeto'>Objeto : </span><span id="value_objeto"></span> <br />
+                <span id='gestorcomissao'>Gestor da UG a qual pertence a Comissão : </span><span id="value_gestorcomissao"></span>
+                
+                
+            </p>
+
+            <p id="detail-objects" style="font-family: Tahoma;font-size:0.9em!important;">&#9642; Detalhamento de Objetos 👇</p>
+            
+            <ul data-icon="false" data-role="listview" id="list_LicitacoesInfDetalhes" data-count-theme="b">
+            </ul>
+
+             <p id="list-info">
+                <span id="atualizacao"></span> <br /> 
+                <span id="fonte"></span> 
+            </p>
+
+        </div>
+      
+
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Transparência Maranguape</h1>
+        </div>
+
+      
+
+        <script type="text/javascript">
+            $("#pre-licitacoes-inf-detalhes").on("pageshow", function()
+                {
+                    
+                    $.mobile.loading("show",{
+                        text : 'Carregando...',
+                        textVisible : true,
+                        theme : 'b'
+
+                    });
+ 
+                    $.getJSON('https://elohimsystems.com.br/tcm/php/pre-licitacoes-inf-detalhes.php?callback=?', {action: "f_select_licitacoes_inf_detalhes",  link : sessionStorage.getItem('lic-link')   }, function(data) 
+                        {                             
+                            
+                            $("#filter").html(data.municipio+' &#187 '+
+                                              ' Prefeitura &#187 '+
+                                              sessionStorage.getItem("opcao-menu")+' &#187 '+
+                                              sessionStorage.getItem("ano-municipio")+' &#187 '+
+                                              data.licitacao);    
+
+                            document.getElementById("value_dhrealizacao").innerHTML = data.cab[0];
+                            document.getElementById("value_dautuacao").innerHTML = data.cab[1];
+                            document.getElementById("value_modalidade").innerHTML = data.cab[2];
+                            document.getElementById("value_tipo").innerHTML = data.cab[3];
+                            document.getElementById("value_vlrestimado").innerHTML = data.cab[4];
+                            document.getElementById("value_vlrlimite").innerHTML = data.cab[5];
+                            document.getElementById("value_objeto").innerHTML = data.cab[6];
+                            document.getElementById("value_gestorcomissao").innerHTML = data.cab[7];
+
+                            document.getElementById("value_vencedor").innerHTML = data.dados[0]["negociante"] + "("+data.dados[0]["cnpjcpf"]+")";
+                            document.getElementById("value_empregado").innerHTML = data.dados[0]["total"];
+
+
+
+
+
+
+
+
+
+
+
+
+                            
+                            const json =  data.objetos;
+                            let list ="";
+                            for(let i = 0, len = json.length; i < len; i++) 
+                              {
+                                list += '<li><a href="#">'+
+                                            '<h1>'+json[i]["descricao"]+'</h1>' +
+                                            '<span class="ui-li-count">'+json[i]["valor"]+'</span>' +
+                                            '</a>' +
+                                      '</li>';
+                              }
+
+                            const ul = $("#list_LicitacoesInfDetalhes"); 
+                            ul.html(list);
+                            ul.listview("refresh");
+                            ul.trigger("updatelayout");
+  
+                            document.getElementById("list-info").style.display = "block";
+                            document.getElementById("filter").style.display = "block";
+                            document.getElementById("info-licitacao").style.display = "block";
+                            document.getElementById("detail-objects").style.display = "block";
+                            document.getElementById("atualizacao").innerHTML = sessionStorage.getItem("atualizacao");
+                            document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+sessionStorage.getItem("fonte"); 
+
+                            $.mobile.loading("hide"); 
+
+    
+                        });      
+                    
+
+                });
+        </script>
+
+   </div> 
+</body>
+ 
+</html>

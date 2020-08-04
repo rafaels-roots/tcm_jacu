@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' gap:;
+                                                       script-src * data: https://ssl.gstatic.com 'unsafe-inline' 'unsafe-eval';
+                                                       object-src *;
+                                                       style-src *;
+                                                       img-src 'self' data:;
+                                                       media-src 'none';
+                                                       font-src *;
+                                                       connect-src *">
+    
+    <link href="https://fonts.googleapis.com/css?family=Mouse+Memoirs|Ubuntu:400,500,700,700i" rel="stylesheet">
+    
+    <link rel="stylesheet" type="text/css" href="css/jqmcss.css" />
+    <title>Tribunal de Contas</title>
+</head>
+
+<body>
+    <div data-role="page" id="menu_principal">
+        <header data-role="header" data-position="fixed">
+           <h3>Menu Principal</h3>     
+           <!--<a href="#" data-transition="fade" id="menu" data-position-to="#menu" data-role="button" data-icon="arrow-l" data-iconshadow="false" data-theme="a" data-iconpos="notext" class="ui-btn-left ui-nodisc-icon az-nodisc">home</a>-->
+        </header>
+
+        <div data-role="main" class="ui-content" id="contentt">
+             <form id="form_login">
+                <fieldset data-role="controlgroup">
+                    <legend id="mun">Orgão : </legend>
+                     <input type="radio" name="escolha" id="prefeitura" value="prefeitura" checked>
+                    <label for="prefeitura">Prefeitura</label>  
+                    <input type="radio" name="escolha" id="vereadores" value="vereadores">
+                    <label for="vereadores">Câmara de Vereadores</label>
+                </fieldset>
+            </form>
+
+            <ul data-role="listview" id="list_MenuPrincipal">
+              <li data-icon="plus"><a href="pre-receitas.html">Receitas</a></li> <!-- retira do site -->
+              <li data-icon="minus"><a href="pre-despesas.html">Despesas</a></li> <!-- retira do site -->
+              <li data-icon="user"><a href="pre-fornecedores.html">Fornecedores</a></li>
+              <li data-icon="edit"><a href="pre-prestacao-contas.html">Prestação de Contas</a></li> <!-- retira do site -->
+              <li data-icon="user"><a href="pre-agentes-publicos.html">Agentes Públicos</a></li>
+              <li data-icon="grid"><a href="pre-licitacoes-inf.html">Licitações Informadas</a></li> <!-- retira do site -->
+              <li data-icon="grid"><a href="pre-licitacoes-publicadas.html">Licitações Publicadas</a></li>
+              <li data-icon="info"><a href="pre-ordenadores-despesas.html">Ordenadores de Despesas</a></li>
+
+              <li data-icon="carat-d"><a href="ver-despesas.html">Despesas</a></li>
+              <li data-icon="user"><a href="ver-fornecedores.html">Fornecedores</a></li>
+              <li data-icon="edit"><a href="ver-prestacao-contas.html">Prestação de Contas</a></li>
+              <li data-icon="user"><a href="ver-agentes-publicos.html">Agentes Públicos</a></li> 
+              <li data-icon="info"><a href="ver-ordenadores-despesas.html">Ordenadores de Despesas</a></li>
+              
+            </ul>
+
+             <p id="list-info">
+                <span id="atualizacao"></span> <br /> 
+                <span id="fonte"></span> 
+            </p>
+
+        </div>
+      
+
+       
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Transparência Maranguape</h1>
+        </div>
+
+      
+        <script type="text/javascript">
+            $("#menu_principal").on("pageshow", function()
+                {
+                  // document.getElementById("usuario").childNodes[0].innerHTML = JSON.parse(sessionStorage.getItem("user-info")).name;
+                  $.mobile.loading("show",{
+                        text : 'Carregando...',
+                        textVisible : true,
+                        theme : 'b'
+
+                    }); 
+                   
+                   $.getJSON('https://elohimsystems.com.br/tcm/php/menu-principal.php?callback=?', {action: "f_select_fonte", param1 : sessionStorage.getItem("codigo-municipio")  }, function(data) 
+                      {   
+                         
+                          sessionStorage.setItem("atualizacao", data.atualizacao);
+                          sessionStorage.setItem("fonte", data.fonte.substring(7));
+
+                          document.getElementById("mun").innerHTML = sessionStorage.getItem("text-municipio") + ' | ' + sessionStorage.getItem("ano-municipio");  
+                          document.getElementById("contentt").style.display = "block";
+                          document.getElementById("list-info").style.display = "block";
+                          document.getElementById("atualizacao").innerHTML = data.atualizacao;
+                          document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+data.fonte.substring(7);  
+                         
+
+                          $.mobile.loading("hide");
+
+                      }); 
+
+                   $("#menu").on("click", function()
+                     {
+                        navigator.app.exitApp();
+                     });
+                
+                    $("input[type=radio]").on("change", function()
+                      {
+                         if($('input[type=radio]:checked').val() == "vereadores") 
+                            {
+                                $("#list_MenuPrincipal a[href^='ver-']").css("display", "block");
+                                $("#list_MenuPrincipal a[href^='pre-']").css("display", "none");
+                            }
+                        else 
+                            {
+                                $("#list_MenuPrincipal a[href^='ver-']").css("display", "none");
+                                $("#list_MenuPrincipal a[href^='pre-']").css("display", "block");
+                            }  
+                       });
+
+
+
+                    $("#list_MenuPrincipal").on("click", ".ui-btn", function()
+                      {
+                          sessionStorage.setItem("opcao-menu", this.innerHTML );
+                      });
+
+                   
+
+                });
+
+        </script>
+
+        
+
+   </div> 
+</body>
+
+</html>

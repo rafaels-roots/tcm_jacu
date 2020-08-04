@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html>
+ 
+<head>
+    <meta charset="utf-8" />
+    <title>Tribunal de Contas</title>
+</head>
+
+<body>
+    <div data-role="page" id="pre-ordenadores-despesas">
+        <header data-role="header" data-position="fixed">
+            <h3>Ordenadores de Despesas</h3>
+        <a href="#" data-transition="fade" data-rel="back" id="menu" data-position-to="#menu" data-role="button" data-icon="back" data-iconshadow="false" data-theme="a" data-iconpos="notext"  class="ui-btn-left ui-nodisc-icon az-nodisc">home</a>
+        </header>
+
+        <div data-role="main" class="ui-content">
+            
+            <div>
+                <p id="filter"></p>
+            </div>
+            
+            <ul data-icon="false" data-role="listview" id="list_OrdenadoresDespesas" data-count-theme="b">
+            </ul>
+
+             <p id="list-info">
+                <span id="atualizacao"></span> <br /> 
+                <span id="fonte"></span> 
+            </p>
+
+        </div>
+      
+
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Transparência Maranguape</h1>
+        </div>
+
+
+        <script type="text/javascript">
+            $("#pre-ordenadores-despesas").on("pageshow", function()
+                {
+                    
+                    $.mobile.loading("show",{
+                        text : 'Carregando...',
+                        textVisible : true,
+                        theme : 'b'
+
+                    });
+
+                    $.getJSON('https://elohimsystems.com.br/tcm/php/pre-ordenadores-despesas.php?callback=?', {action: "f_select_ordenadores_despesas", param1 : sessionStorage.getItem("codigo-municipio"), param2 : sessionStorage.getItem("ano-municipio")  }, function(data) 
+                        { 
+                            
+                           $("#filter").html(sessionStorage.getItem("text-municipio")+' &#187 '+
+                                              'Prefeitura &#187 ' +
+                                              sessionStorage.getItem('opcao-menu') + ' &#187 ' +
+                                              sessionStorage.getItem('ano-municipio'));
+
+                            
+                           const json = data.dados; 
+                           let list = "";
+                           for(let i = 0, len = json.length; i < len; i++) 
+                               {
+                                    if(json[i]["UnidGestora"] == null) 
+                                        {
+                                            list += '<li><a href="#">'+json[i]["UnidOrcamentaria"]+
+                                                        '<p><strong>'+json[i]["Cpf"]+'</strong> <br /> Criação Inclusão : ' 
+                                                             +json[i]["Criacao"]+' -  Início : ' 
+                                                             +json[i]["Inicio"]+' <br /> Gestor : '
+                                                             +json[i]["Gestor"]+' - Ordenador : ' 
+                                                             +json[i]["Ordenador"]+'</p>' +
+                                                            '</a>' +
+                                                      '</li>'; 
+                                        }
+                                    else 
+                                        {
+                                            list += '<li data-role="list-divider" data-theme="b">'+json[i]["UnidGestora"]+'<span class="ui-li-count">'+json[i]["Criacao"]+'</span></li>';
+                                        }    
+
+                               }
+
+
+
+                            const ul = $("#list_OrdenadoresDespesas");
+                            ul.append(list);
+                            ul.listview("refresh");
+                            ul.trigger("updatelayout");
+  
+                            document.getElementById("list-info").style.display = "block";
+                            document.getElementById("filter").style.display = "block";
+                            document.getElementById("atualizacao").innerHTML = sessionStorage.getItem("atualizacao");
+                            document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+sessionStorage.getItem("fonte"); 
+
+                            $.mobile.loading("hide"); 
+    
+                        });      
+                });
+        </script>
+
+   </div> 
+</body>
+ 
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' gap:;
+                                                       script-src * data: https://ssl.gstatic.com 'unsafe-inline' 'unsafe-eval';
+                                                       object-src *;
+                                                       style-src *;
+                                                       img-src 'self' data:;
+                                                       media-src 'none';
+                                                       font-src *;
+                                                       connect-src *">
+    
+
+    <link href="https://fonts.googleapis.com/css?family=Mouse+Memoirs|Ubuntu:400,500,700,700i" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/jqmcss.css" />
+
+
+    <title>Tribunal de Contas</title>
+
+     <script type="text/javascript">
+       function onBackButtonTapped() 
+          {
+              $.mobile.activePage.attr('id') == "municipios" || $.mobile.activePage.attr('id') == "menu_principal" ? navigator.app.exitApp() : window.history.back();
+          }
+        function openExternal(elem) 
+          {
+              window.open(elem, "_system");
+              return false; // Prevent execution of the default onClick handler 
+          }         
+    </script>
+</head>
+
+<body>
+    <div data-role="page" id="index">
+        <!--<header data-role="header" data-position="fixed">
+            <h3>Ínicio</h3>
+        </header>-->
+
+
+        <div data-role="main" class="ui-content" id="content">
+
+            <div id="divIMG" style="">
+                <img src="img/lg.png" alt="image"/>
+            </div>
+            
+             <form id="form_municipios">
+              
+                <div data-role="fieldcontain">
+                    <label for="ano">Escolha o ano :</label> 
+                    <select name="ano" id="ano">
+                        <option value="2020">2020</option>
+                        <option value="2019">2019</option>
+                        <option value="2018">2018</option>
+                        <option value="2017">2017</option>
+                   </select>
+               </div>
+               <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-a button1" id="avancar" style="display:none!important;">Avançar</a>
+                
+            </form>
+            
+        </div>
+
+        <!--<div data-role="footer" data-position="fixed">
+            <h1>-</h1>
+        </div>-->
+
+      
+         <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery-2.2.4.js"></script>
+        <script type="text/javascript" src="js/jquerymobile.js"></script>
+
+
+       
+        <!--<script src="/nd2settings.js"></script>-->
+
+
+        <script type="text/javascript">
+            $("#index").on("pageshow", function()
+                {
+                    //getJSON
+                    $.mobile.allowCrossDomainPages = true;
+                    //getJSON
+
+                     $.getJSON('https://elohimsystems.com.br/tcm/php/version.php?callback=?', {action: "f_version"}, function(data) 
+                      {   
+                            //operador é diferente porque é string
+                            if(data.keypass != "2.2") 
+                              {
+                                  alert("Atualize o app para continuar..");
+                                  navigator.app.exitApp();
+                                  return openExternal("https://play.google.com/store/apps/details?id=tcm.com");
+                                  
+                              }
+                            $.mobile.loading("hide");
+                            $("#avancar").css("display", "block")
+
+                      }); 
+
+                    document.getElementById("avancar").onclick = function()
+                        {
+                          $.mobile.loading("show", { text: "Carregando...", textVisible: true, theme : "b" });;
+
+                          sessionStorage.setItem("ano-municipio", $("#ano").val() );   
+                          sessionStorage.setItem("codigo-municipio", "012" );
+                          sessionStorage.setItem("text-municipio", "Apuiarés");
+                          $.mobile.changePage("menu_principal.html");                                     
+                          
+
+                        }
+
+                });
+        </script>
+
+   </div> 
+</body>
+ 
+</html>

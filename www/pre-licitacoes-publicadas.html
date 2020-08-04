@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html> 
+ 
+<head>
+    <meta charset="utf-8" />
+    <title>Tribunal de Contas</title>
+</head>
+
+<body>
+    <div data-role="page" id="pre-licitacoes-publicadas">
+        <header data-role="header" data-position="fixed">
+            <h3>Licitações Publicadas</h3>
+            <a href="#" data-transition="fade" data-rel="back" id="menu" data-position-to="#menu" data-role="button" data-icon="back" data-iconshadow="false" data-theme="a" data-iconpos="notext"  class="ui-btn-left ui-nodisc-icon az-nodisc">home</a>
+        </header>
+
+        <div data-role="main" class="ui-content">
+            
+            <div>
+                <p id="filter"></p>
+            </div>
+            
+            <ul data-icon="false" data-role="listview" id="list_LicitacoesPublicadas" data-filter="true" data-filter-placeholder="Buscar..." data-count-theme="b"></ul>
+
+
+            <div class="ui-grid-b" id="next-previous">
+                <div class="ui-block-a"><a href="#" class="ui-shadow ui-btn ui-btn-b ui-corner-all ui-icon-carat-l ui-btn-icon-notext ui-btn-inline">previous</a></div>
+                <div class="ui-block-b">1</div>
+                <div class="ui-block-c"><a href="#" class="ui-shadow ui-btn ui-btn-b ui-corner-all ui-icon-carat-r ui-btn-icon-notext ui-btn-inline">next</a></div>
+            </div>
+
+            <p id="list-info">
+                <span id="atualizacao"></span> <br /> 
+                <span id="fonte"></span> 
+            </p>
+
+        </div> 
+      
+
+      
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Transparência Maranguape</h1>
+        </div>
+
+
+
+        <script type="text/javascript">
+            $("#pre-licitacoes-publicadas").on("pageshow", function()
+                {
+                    
+                    $.mobile.loading("show",{
+                        text : 'Carregando...',
+                        textVisible : true,
+                        theme : 'b'
+
+                    });
+
+                    $.getJSON('https://elohimsystems.com.br/tcm/php/pre-licitacoes-publicadas.php?callback=?', {action: "f_select_licitacoes_publicadas", param1 : sessionStorage.getItem("codigo-municipio"), param2 : "1"  }, function(data) 
+                        { 
+
+                            $("#filter").html(sessionStorage.getItem("text-municipio")+' &#187 '+
+                                              'Prefeitura &#187 '+
+                                              sessionStorage.getItem("opcao-menu")+' &#187 '+
+                                              sessionStorage.getItem("ano-municipio"));
+                            
+
+                            const dados =  data.dados;
+                            let dtr = "";
+                            let list_LicitacoesPublicadas ="";
+                            for(let i = 0; i < dados.length; i++) 
+                              {
+                                if(dados[i]['dtreabertura']) { dtr = "-"; } else { dtr = dados[i]['dtreabertura']; }
+                                list_LicitacoesPublicadas += "<li><a href='#'>"+ dados[i]['codigo'] + 
+                                                                    "<p class='uiaa'><strong>Objeto :</strong> "+dados[i]['objeto']+"<br />" +
+                                                                        "<strong>Dt. Abertura :</strong> "+dados[i]['dtabertura']+" - " +
+                                                                        "<strong>Dt. Reabertura :</strong> " +dtr +
+                                                                    "</p>" +
+                                                                    "<span class='ui-li-count'>"+dados[i]["status"]+"</span>"  +
+                                                                "</a>"+
+                                                            "</li>";
+                              }    
+                           
+
+                            const ul = $("#list_LicitacoesPublicadas"); 
+                            ul.html(list_LicitacoesPublicadas);
+                            ul.listview("refresh");
+                            ul.trigger("updatelayout");
+   
+    
+                            document.getElementById("list-info").style.display = "block";
+                            document.getElementById("filter").style.display = "block";
+                            document.getElementById("atualizacao").innerHTML = sessionStorage.getItem("atualizacao");
+                            document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+sessionStorage.getItem("fonte"); 
+                            document.getElementById("next-previous").style.display = "block";
+
+                            sessionStorage.setItem("pg",1);
+                            $.mobile.loading("hide"); 
+                                    
+
+                        });  
+
+                     $("#next-previous").on("click", "a", function()
+                         {
+                            $.mobile.loading("show",{
+                                text : 'Carregando...',
+                                textVisible : true,
+                                theme : 'b'
+                            });
+
+                            let pg = parseInt(sessionStorage.getItem("pg"));
+                            if( $(this).text() == "next" ) {
+                              pg++;  
+                            }
+                            else {
+                                pg--;
+                            }
+
+                            sessionStorage.setItem("pg", pg);
+
+                            $(".ui-content").css("display", "none"); 
+                            $.getJSON('https://elohimsystems.com.br/tcm/php/pre-licitacoes-publicadas.php?callback=?', {action: "f_select_licitacoes_publicadas", param1 : sessionStorage.getItem("codigo-municipio"), param2 : pg.toString()  }, function(data) 
+                                { 
+                                    
+                                   $("#filter").html(sessionStorage.getItem("text-municipio")+' &#187 '+
+                                              'Prefeitura &#187 '+
+                                              sessionStorage.getItem("opcao-menu")+' &#187 '+
+                                              sessionStorage.getItem("ano-municipio"));
+
+                                    const ul = $("#list_LicitacoesPublicadas");           
+
+                                    $("#list_LicitacoesPublicadas li").remove();
+                                    
+                                    $(".ui-content").css("display", "block");
+                                    if(data.isend== "true") {
+                                        $("#next-previous .ui-block-c a").addClass('ui-disabled');
+                                    }
+                                    else {
+                                        $("#next-previous .ui-block-c a").removeClass('ui-disabled');;   
+                                    }
+
+
+                                    const dados =  data.dados;
+                                    let dtr = "";
+                                    let list_LicitacoesPublicadas ="";
+                                    for(let i = 0; i < dados.length; i++) 
+                                      {
+                                        if(dados[i]['dtreabertura']) { dtr = "-"; } else { dtr = dados[i]['dtreabertura']; }
+                                        list_LicitacoesPublicadas += "<li><a href='#'>"+ dados[i]['codigo'] + 
+                                                                            "<p class='uiaa'><strong>Objeto :</strong> "+dados[i]['objeto']+"<br />" +
+                                                                                "<strong>Dt. Abertura :</strong> "+dados[i]['dtabertura']+" - " +
+                                                                                "<strong>Dt. Reabertura :</strong> " +dtr +
+                                                                            "</p>" +
+                                                                            "<span class='ui-li-count'>"+dados[i]["status"]+"</span>"  +
+                                                                        "</a>"+
+                                                                    "</li>";
+                                      }    
+
+
+
+                                    ul.html(list_LicitacoesPublicadas);
+                                    ul.listview("refresh");
+                                    ul.trigger("updatelayout");
+
+                                    $("#next-previous .ui-block-b").text(pg);
+                                    sessionStorage.setItem("pg",pg);
+                                    $.mobile.loading("hide"); 
+                                            
+
+                                });
+                         }) ;  
+
+                });
+        </script>
+
+   </div> 
+</body>
+ 
+</html>

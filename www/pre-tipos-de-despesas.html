@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+   
+    <title>Tribunal de Contas</title>
+</head>
+
+<body>
+    <div data-role="page" id="pre-tipos-de-despesas">
+        <header data-role="header" data-position="fixed">
+            <h3>Favorecidos</h3>
+            <a href="#" data-transition="fade" data-rel="back" id="menu" data-position-to="#menu" data-role="button" data-icon="back" data-iconshadow="false" data-theme="a" data-iconpos="notext"  class="ui-btn-left ui-nodisc-icon az-nodisc">home</a>
+        </header>
+
+        <div data-role="main" class="ui-content">
+            
+            <div>
+                <p id="filter"></p>
+            </div>
+            
+            <ul data-icon="false" data-role="listview" id="list_TiposDespesas" data-filter="true" data-filter-placeholder="Buscar..." data-count-theme="b"></ul>
+
+            <p id="list-info">
+                <span id="atualizacao"></span> <br /> 
+                <span id="fonte"></span> 
+            </p>
+        </div>
+      
+
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Transparência Maranguape</h1>
+        </div>
+
+      
+
+        <script type="text/javascript">
+            $("#pre-tipos-de-despesas").on("pageshow", function()
+                {
+                    
+                  $.mobile.loading("show",{
+                        text : 'Carregando...',
+                        textVisible : true,
+                        theme : 'b'
+
+                    }); 
+
+                    $.getJSON('https://elohimsystems.com.br/tcm/php/pre-tipos-de-despesas.php?callback=?', {action: "f_select_tipos_despesas", link : sessionStorage.getItem('despesa-link')  }, function(data) 
+                        { 
+                        
+                            const total = data.total == null ? "Não foi encontrado Registro para o exercicio de "+sessionStorage.getItem("ano-municipio") : data.total;     
+                           $("#filter").html(sessionStorage.getItem("text-municipio")+' &#187 '+
+                                              'Prefeitura &#187 ' +
+                                              sessionStorage.getItem('opcao-menu') + ' &#187 ' +
+                                              sessionStorage.getItem('despesa-text') + ' &#187 ' + 
+                                              sessionStorage.getItem('ano-municipio') + ' &#187 ' + total);
+
+                           const json = data.dados; 
+                           let list = "";
+                           for(let i = 0, len = json.length; i < len; i++) 
+                               {
+                                    list += "<li><a href='pre-favorecidos.html' id='"+json[i]["link"]+"'><h1>"+json[i]["despesa"]+"</h1><span class='ui-li-count'>"+json[i]["valor"]+"</span></a></li>";
+
+                               }
+                            const ul = $("#list_TiposDespesas");
+                            ul.append(list);
+                            ul.listview("refresh");
+                            ul.trigger("updatelayout");
+
+                            document.getElementById("list-info").style.display = "block";
+                            document.getElementById("filter").style.display = "block";
+                            document.getElementById("atualizacao").innerHTML = sessionStorage.getItem("atualizacao");
+                            document.getElementById("fonte").innerHTML = "<strong>Fonte : </strong>"+sessionStorage.getItem("fonte"); 
+
+                            $.mobile.loading("hide");
+    
+                        }); 
+
+                    $("#list_TiposDespesas").on("click", ".ui-btn", function()
+                        {
+                            sessionStorage.setItem("tdespesa-text", $(this).find('h1').text() );
+                            sessionStorage.setItem("tdespesa-link", this.id );
+                        });         
+                }); 
+        </script>
+
+   </div> 
+</body>
+ 
+</html>
