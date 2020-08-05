@@ -389,7 +389,17 @@ ul li a {
 #index #divIMG img 
 {
 	width: 100%!important;
+	
 }	
+
+#index .name-app {
+	color:#fff!important;
+	text-shadow: none!important;
+	font-family:'Ubuntu', Tahoma!important;
+	font-size:1.5em!important;
+	text-align: center!important;
+	font-weight: 500;
+}
 #index .ui-select div	
 {
 	background-color: #106653!important;
